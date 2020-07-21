@@ -1,0 +1,61 @@
+Dynamic Host Creation in Ansible
+
+1.	Create an AWS IAM user with EC2 full access and give programmatic access
+2.	Login in to the EC2 Instance and configure awscli with below commands
+Check aws –version, If it not installed in your instance follow below commands
+a.	apt/yum install awscli
+b.	apt/yum install python-boto
+c.	check the .aws folder permission
+d.	configure awscli with below commands
+i.	aws configure
+ii.	enter accesskey
+iii.	enter security key
+iv.	enter region details
+v.	enter format as json
+ Now check the aws –version.
+3.	Gotot /etc/ansible folder and add below files into this folder
+a.	ec2.py (https://github.com/ansible/ansible/blob/stable-2.8/contrib/inventory/ec2.py)
+b.	ec2.ini (https://github.com/ansible/ansible/blob/stable-2.8/contrib/inventory/ec2.ini)
+ After adding above files, We need to change the ec2.py file permissions
+         chmod +x ec2.py
+After changing above file permissions, then execute 
+   ./ec2.py  --list
+4.	Goto user(home) folder, Example either Ubuntu or something
+Add below lines in .bashrc file
+vim .bashrc
+export ANSIBLE_HOSTS=/etc/ansible/ec2.py
+export EC2_INI_PATH=/etc/ansible/ec2.ini
+save that file
+then execute below commands
+$source .bashrc
+$echo $ANSIBLE_HOSTS
+5.	Goto your home folder and create a new folder
+mkdir testoles
+goto testroles folder , and run the below commands
+
+
+
+
+
+vim site.yml
+
+---  
+-	name:  Test dynamic role execution
+hosts: tag_Key_Value
+gather_facts: true
+become: true
+roles:
+   -  dynamicrole
+Now save the above file and create a role with name dynamicrole with below commands
+$ansible-galaxy init dynamicrole
+Now, execute ansible commands to check whether it is connecting to dynamic ec2 instances
+Ansible –m ping “tag_Key_Value”
+
+ansible-playbook site.yml
+
+
+
+
+
+
+
