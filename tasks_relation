@@ -1,0 +1,41 @@
+Install.yml
+---
+-
+  command: apachectl -V
+  register: apache_log
+  ignore_errors: true
+
+- debug:
+    var: apache_log
+
+-
+  apt:
+    name: apache2
+    state: present
+  register: webserver
+  when: apache_log.failed == true
+-
+  debug:
+    var: webserver
+
+-
+  command: service apache2 stop
+  when: webserver.failed == false
+  ignore_errors: true
+
+-
+  add_host:
+    APACHE_LOG: "{{ apache_log.failed }}"
+    name: "DUMMY_HOST"
+	
+Configure.yml	
+---
+- name: Create file with some content
+  shell: "echo '{{ hostvars['DUMMY_HOST']['APACHE_LOG'] }}' >> /home/ubuntu/java_log.txt"
+  
+Main.yml
+  
+---
+- include_tasks: install.yml
+- include_tasks: configure.yml
+
